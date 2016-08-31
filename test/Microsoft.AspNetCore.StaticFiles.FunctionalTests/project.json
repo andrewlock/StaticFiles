@@ -5,7 +5,8 @@
     "copyToOutput": {
       "include": [
         "SubFolder/**/*",
-        "TestDocument.txt"
+        "TestDocument.txt",
+        "TestDocument1MB.txt"
       ]
     }
   },
@@ -20,7 +21,9 @@
     "dotnet-test-xunit": "2.2.0-*",
     "Microsoft.AspNetCore.StaticFiles": "1.1.0-*",
     "Microsoft.AspNetCore.Server.Kestrel": "1.1.0-*",
+    "Microsoft.AspNetCore.Server.WebListener": "0.2.0-*",
     "Microsoft.AspNetCore.Testing": "1.1.0-*",
+    "Microsoft.AspNetCore.Server.IntegrationTesting": "0.2.0-*",
     "Microsoft.Extensions.Logging.Testing": "1.1.0-*",
     "xunit": "2.2.0-*"
   },

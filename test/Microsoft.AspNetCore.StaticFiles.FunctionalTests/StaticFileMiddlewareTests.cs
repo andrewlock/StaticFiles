@@ -7,10 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.IntegrationTesting;
 using Microsoft.AspNetCore.Testing.xunit;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -156,5 +160,89 @@ namespace Microsoft.AspNetCore.StaticFiles
             new[] {"/somedir", @"SubFolder", "/somedir/ranges.txt"},
             new[] {"", @"SubFolder", "/Empty.txt"}
         };
+
+        [Fact]
+        public void ClientDisconnect_Kestrel_NoWriteExceptionThrown()
+        {
+            ClientDisconnect_NoWriteExceptionThrown(ServerType.Kestrel);
+        }
+
+        [ConditionalFact]
+        [OSSkipCondition(OperatingSystems.Linux)]
+        [OSSkipCondition(OperatingSystems.MacOSX)]
+        public void ClientDisconnect_WebListener_NoWriteExceptionThrown()
+        {
+            ClientDisconnect_NoWriteExceptionThrown(ServerType.WebListener);
+        }
+
+        public void ClientDisconnect_NoWriteExceptionThrown(ServerType serverType)
+        {
+            var baseAddress = "http://localhost:12345";
+            var requestReceived = new ManualResetEvent(false);
+            var requestCacelled = new ManualResetEvent(false);
+            var responseComplete = new ManualResetEvent(false);
+            Exception exception = null;
+            var builder = new WebHostBuilder()
+                .UseWebRoot(Path.Combine(Directory.GetCurrentDirectory()))
+                .Configure(app =>
+                {
+                    app.Use(async (context, next) =>
+                    {
+                        try
+                        {
+                            requestReceived.Set();
+                            Assert.True(requestCacelled.WaitOne(TimeSpan.FromSeconds(10)), "not cancelled");
+                            Assert.True(context.RequestAborted.WaitHandle.WaitOne(TimeSpan.FromSeconds(10)), "not aborted");
+                            await next();
+                        }
+                        catch (Exception ex)
+                        {
+                            exception = ex;
+                        }
+                        responseComplete.Set();
+                    });
+                    app.UseStaticFiles();
+                });
+
+            if (serverType == ServerType.WebListener)
+            {
+                builder.UseWebListener();
+            }
+            else if (serverType == ServerType.Kestrel)
+            {
+                builder.UseKestrel();
+            }
+
+            using (var server = builder.Start(baseAddress))
+            {
+                // We don't use HttpClient here because it's disconnect behavior varies across platforms.
+                var socket = SendSocketRequestAsync(baseAddress, "/TestDocument1MB.txt");
+                Assert.True(requestReceived.WaitOne(TimeSpan.FromSeconds(10)), "not received");
+
+                socket.LingerState = new LingerOption(true, 0);
+                socket.Dispose();
+                requestCacelled.Set();
+
+                Assert.True(responseComplete.WaitOne(TimeSpan.FromSeconds(10)), "not completed");
+                Assert.Null(exception);
+            }
+        }
+
+        private Socket SendSocketRequestAsync(string address, string path, string method = "GET")
+        {
+            var uri = new Uri(address);
+            var builder = new StringBuilder();
+            builder.AppendLine($"{method} {path} HTTP/1.1");
+            builder.Append("HOST: ");
+            builder.AppendLine(uri.Authority);
+            builder.AppendLine();
+
+            byte[] request = Encoding.ASCII.GetBytes(builder.ToString());
+
+            var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(uri.Host, uri.Port);
+            socket.Send(request);
+            return socket;
+        }
     }
 }
