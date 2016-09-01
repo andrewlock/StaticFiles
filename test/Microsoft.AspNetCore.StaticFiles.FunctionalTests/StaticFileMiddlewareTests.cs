@@ -240,7 +240,7 @@ namespace Microsoft.AspNetCore.StaticFiles
             byte[] request = Encoding.ASCII.GetBytes(builder.ToString());
 
             var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(uri.Host, uri.Port);
+            socket.Connect(IPAddress.Loopback, uri.Port);
             socket.Send(request);
             return socket;
         }
