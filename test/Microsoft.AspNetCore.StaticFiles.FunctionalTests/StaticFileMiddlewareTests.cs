@@ -177,6 +177,7 @@ namespace Microsoft.AspNetCore.StaticFiles
 
         public void ClientDisconnect_NoWriteExceptionThrown(ServerType serverType)
         {
+            var interval = TimeSpan.FromSeconds(60);
             var baseAddress = "http://localhost:12345";
             var requestReceived = new ManualResetEvent(false);
             var requestCacelled = new ManualResetEvent(false);
@@ -191,8 +192,8 @@ namespace Microsoft.AspNetCore.StaticFiles
                         try
                         {
                             requestReceived.Set();
-                            Assert.True(requestCacelled.WaitOne(TimeSpan.FromSeconds(10)), "not cancelled");
-                            Assert.True(context.RequestAborted.WaitHandle.WaitOne(TimeSpan.FromSeconds(10)), "not aborted");
+                            Assert.True(requestCacelled.WaitOne(interval), "not cancelled");
+                            Assert.True(context.RequestAborted.WaitHandle.WaitOne(interval), "not aborted");
                             await next();
                         }
                         catch (Exception ex)
@@ -217,13 +218,13 @@ namespace Microsoft.AspNetCore.StaticFiles
             {
                 // We don't use HttpClient here because it's disconnect behavior varies across platforms.
                 var socket = SendSocketRequestAsync(baseAddress, "/TestDocument1MB.txt");
-                Assert.True(requestReceived.WaitOne(TimeSpan.FromSeconds(10)), "not received");
+                Assert.True(requestReceived.WaitOne(interval), "not received");
 
                 socket.LingerState = new LingerOption(true, 0);
                 socket.Dispose();
                 requestCacelled.Set();
 
-                Assert.True(responseComplete.WaitOne(TimeSpan.FromSeconds(10)), "not completed");
+                Assert.True(responseComplete.WaitOne(interval), "not completed");
                 Assert.Null(exception);
             }
         }
