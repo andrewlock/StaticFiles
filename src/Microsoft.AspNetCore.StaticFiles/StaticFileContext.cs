@@ -31,6 +31,7 @@ namespace Microsoft.AspNetCore.StaticFiles
         private readonly ILogger _logger;
         private readonly IFileProvider _fileProvider;
         private readonly IContentTypeProvider _contentTypeProvider;
+        private readonly IResponseCacheFilter _responseCacheFilter;
         private string _method;
         private bool _isGet;
         private bool _isHead;
@@ -51,7 +52,7 @@ namespace Microsoft.AspNetCore.StaticFiles
 
         private IList<RangeItemHeaderValue> _ranges;
 
-        public StaticFileContext(HttpContext context, StaticFileOptions options, PathString matchUrl, ILogger logger, IFileProvider fileProvider, IContentTypeProvider contentTypeProvider)
+        public StaticFileContext(HttpContext context, StaticFileOptions options, PathString matchUrl, ILogger logger, IFileProvider fileProvider, IContentTypeProvider contentTypeProvider, IResponseCacheFilter responseCacheFilter)
         {
             _context = context;
             _options = options;
@@ -63,6 +64,7 @@ namespace Microsoft.AspNetCore.StaticFiles
             _responseHeaders = _response.GetTypedHeaders();
             _fileProvider = fileProvider;
             _contentTypeProvider = contentTypeProvider;
+            _responseCacheFilter = responseCacheFilter;
 
             _method = null;
             _isGet = false;
@@ -308,11 +310,18 @@ namespace Microsoft.AspNetCore.StaticFiles
                 // it is not returned for 304, 412, and 416
                 _response.ContentLength = _length;
             }
-            _options.OnPrepareResponse(new StaticFileResponseContext()
+            var staticFileContext = new StaticFileResponseContext
             {
                 Context = _context,
                 File = _fileInfo,
-            });
+            };
+
+            var cacheProfile = _options.CacheProfileProvider(staticFileContext) ?? _options.DefaultCacheProfile;
+            if (cacheProfile != null)
+            {
+                _responseCacheFilter.ApplyCacheProfile(_context, cacheProfile);
+            }
+            _options.OnPrepareResponse(staticFileContext);
         }
 
         public PreconditionState GetPreconditionState()

@@ -26,6 +26,7 @@ namespace Microsoft.AspNetCore.Builder
         public StaticFileOptions(SharedOptions sharedOptions) : base(sharedOptions)
         {
             OnPrepareResponse = _ => { };
+            CacheProfileProvider = _ => null;
         }
 
         /// <summary>
@@ -39,6 +40,17 @@ namespace Microsoft.AspNetCore.Builder
         /// http://www.w3.org/Protocols/rfc2616/rfc2616-sec7.html#sec7
         /// </summary>
         public string DefaultContentType { get; set; }
+
+        /// <summary>
+        /// The default cache profile settings to apply to all static files served. 
+        /// </summary>
+        public CacheProfile DefaultCacheProfile { get; set; }
+
+        /// <summary>
+        /// Called to provide a specific <see cref="CacheProfile"/> for the given 
+        /// <see cref="StaticFileResponseContext"/>. Return null to use the <see cref="DefaultCacheProfile"/>.
+        /// </summary>
+        public Func<StaticFileResponseContext, CacheProfile> CacheProfileProvider { get; set; }
 
         /// <summary>
         /// If the file is not a recognized content-type should it be served?

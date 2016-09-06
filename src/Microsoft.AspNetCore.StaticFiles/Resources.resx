@@ -138,4 +138,7 @@
   <data name="HtmlDir_TableSummary" xml:space="preserve">
     <value>The list of files in the given directory.  Column headers are listed in the first row.</value>
   </data>
+  <data name="ResponseCache_SpecifyDuration" xml:space="preserve">
+    <value>If the '{0}' property is not set to true, '{1}' property must be specified.</value>
+  </data>
 </root>

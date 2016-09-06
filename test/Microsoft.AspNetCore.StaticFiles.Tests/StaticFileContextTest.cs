@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.StaticFiles
         {
             // Arrange
             var options = new StaticFileOptions();
-            var context = new StaticFileContext(new DefaultHttpContext(), options, PathString.Empty, NullLogger.Instance, new TestFileProvider(), new FileExtensionContentTypeProvider());
+            var context = new StaticFileContext(new DefaultHttpContext(), options, PathString.Empty, NullLogger.Instance, new TestFileProvider(), new FileExtensionContentTypeProvider(), new ResponseCacheFilter());
 
             // Act
             var validateResult = context.ValidatePath();
@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.StaticFiles
             var pathString = new PathString("/test");
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Path = new PathString("/test/foo.txt");
-            var context = new StaticFileContext(httpContext, options, pathString, NullLogger.Instance, fileProvider, new FileExtensionContentTypeProvider());
+            var context = new StaticFileContext(httpContext, options, pathString, NullLogger.Instance, fileProvider, new FileExtensionContentTypeProvider(), new ResponseCacheFilter());
 
             // Act
             context.ValidatePath();

@@ -122,6 +122,11 @@ namespace Microsoft.AspNetCore.StaticFiles
             return GetString("HtmlDir_TableSummary");
         }
 
+        internal static string FormatResponseCache_SpecifyDuration(string p0, string p1)
+        {
+            return string.Format(CultureInfo.CurrentCulture, GetString("ResponseCache_SpecifyDuration"), p0, p1);
+        }
+
         private static string GetString(string name, params string[] formatterNames)
         {
             var value = _resourceManager.GetString(name);
