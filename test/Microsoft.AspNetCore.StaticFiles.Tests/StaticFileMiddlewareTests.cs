@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -107,6 +108,64 @@ namespace Microsoft.AspNetCore.StaticFiles
                     stream.Read(fileContents, 0, (int)stream.Length);
                     Assert.True(responseContent.SequenceEqual(fileContents));
                 }
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ExistingFiles))]
+        public async Task FoundFile_Served_UsesDefaultCacheProfile(string baseUrl, string baseDir, string requestUrl)
+        {
+            using (var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), baseDir)))
+            {
+                var server = StaticFilesTestServer.Create(app => app.UseStaticFiles(new StaticFileOptions
+                {
+                    RequestPath = new PathString(baseUrl),
+                    FileProvider = fileProvider,
+                    DefaultCacheProfile = new CacheProfile { NoStore = true }
+                }));
+                var response = await server.CreateRequest(requestUrl).GetAsync();
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("no-store", response.Headers.CacheControl.ToString());
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ExistingFiles))]
+        public async Task FoundFile_Served_UsesCacheProfileProvider(string baseUrl, string baseDir, string requestUrl)
+        {
+            using (var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), baseDir)))
+            {
+                var server = StaticFilesTestServer.Create(app => app.UseStaticFiles(new StaticFileOptions
+                {
+                    RequestPath = new PathString(baseUrl),
+                    FileProvider = fileProvider,
+                    CacheProfileProvider = _ => new CacheProfile { NoStore = true }
+                }));
+                var response = await server.CreateRequest(requestUrl).GetAsync();
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("no-store", response.Headers.CacheControl.ToString());
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ExistingFiles))]
+        public async Task FoundFile_Served_UsesCacheProfileProviderInsteadOfDefault(string baseUrl, string baseDir, string requestUrl)
+        {
+            using (var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), baseDir)))
+            {
+                var server = StaticFilesTestServer.Create(app => app.UseStaticFiles(new StaticFileOptions
+                {
+                    RequestPath = new PathString(baseUrl),
+                    FileProvider = fileProvider,
+                    DefaultCacheProfile = new CacheProfile {  Duration = 60},
+                    CacheProfileProvider = _ => new CacheProfile { NoStore = true }
+                }));
+                var response = await server.CreateRequest(requestUrl).GetAsync();
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("no-store", response.Headers.CacheControl.ToString());
             }
         }
 
