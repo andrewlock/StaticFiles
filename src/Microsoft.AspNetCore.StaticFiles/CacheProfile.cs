@@ -4,7 +4,7 @@
 namespace Microsoft.AspNetCore.StaticFiles
 {
     /// <summary>
-    /// Defines a set of settings which can be used for response caching.
+    /// Defines settings used for caching responses for the <see cref="StaticFileMiddleware"/>.
     /// </summary>
     public class CacheProfile
     {
