@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -80,6 +81,11 @@ namespace Microsoft.AspNetCore.StaticFiles
                         cacheControlValue = "no-cache";
                         headers[HeaderNames.Pragma] = "no-cache";
                         break;
+
+                    default:
+                        var exception = new NotImplementedException($"Unknown {nameof(ResponseCacheLocation)}: {location}");
+                        Debug.Fail(exception.ToString());
+                        throw exception;
                 }
 
                 cacheControlValue = string.Format(
