@@ -33,15 +33,13 @@ namespace Microsoft.AspNetCore.StaticFiles
             var varyByHeader = cacheProfile.VaryByHeader;
             var location = cacheProfile.Location ?? ResponseCacheLocation.Any;
 
-            if (!noStore)
+            if (!noStore && cacheProfile.Duration == null)
             {
                 // Duration MUST be set unless NoStore is true.
-                if (cacheProfile.Duration == null)
-                {
-                    throw new InvalidOperationException(
-                            Resources.FormatResponseCache_SpecifyDuration(
-                                nameof(CacheProfile.NoStore), nameof(CacheProfile.Duration)));
-                }
+                throw new InvalidOperationException(
+                        Resources.FormatResponseCache_SpecifyDuration(
+                            nameof(CacheProfile.NoStore), nameof(CacheProfile.Duration)));
+
             }
 
             var headers = context.Response.Headers;
