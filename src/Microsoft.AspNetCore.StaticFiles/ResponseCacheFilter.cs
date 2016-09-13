@@ -90,15 +90,11 @@ namespace Microsoft.AspNetCore.StaticFiles
 
                 cacheControlValue = string.Format(
                     CultureInfo.InvariantCulture,
-                    "{0}{1}max-age={2}",
+                    "{0},max-age={1}",
                     cacheControlValue,
-                    cacheControlValue != null ? "," : null,
-                    cacheProfile.Duration);
+                    cacheProfile.Duration ?? 0);
 
-                if (cacheControlValue != null)
-                {
-                    headers[HeaderNames.CacheControl] = cacheControlValue;
-                }
+                headers[HeaderNames.CacheControl] = cacheControlValue;
             }
         }
     }
