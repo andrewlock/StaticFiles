@@ -45,11 +45,6 @@ namespace Microsoft.AspNetCore.StaticFiles
 
             var headers = context.Response.Headers;
 
-            // Clear all headers
-            headers.Remove(HeaderNames.Vary);
-            headers.Remove(HeaderNames.CacheControl);
-            headers.Remove(HeaderNames.Pragma);
-
             if (!string.IsNullOrEmpty(varyByHeader))
             {
                 headers[HeaderNames.Vary] = varyByHeader;
