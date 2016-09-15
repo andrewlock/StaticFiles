@@ -10,18 +10,19 @@ namespace Microsoft.AspNetCore.StaticFiles
     {
         /// <summary>
         /// Gets or sets the duration in seconds for which the response is cached.
-        /// If this property is set to a non null value,
-        /// the "max-age" in "Cache-control" header is set in the 
+        /// Sets the "max-age" in the "Cache-control" header in the 
         /// <see cref="Microsoft.AspNetCore.Http.HttpContext.Response" />.
+        /// Defaults to 10 minutes
         /// </summary>
-        public int? Duration { get; set; }
+        public int Duration { get; set; } = 600;
 
         /// <summary>
         /// Gets or sets the location where the data from a particular URL must be cached.
-        /// If this property is set to a non null value,
-        /// the "Cache-control" header is set in the <see cref="Microsoft.AspNetCore.Http.HttpContext.Response" />.
+        /// Sets the "Cache-control" header in the 
+        /// <see cref="Microsoft.AspNetCore.Http.HttpContext.Response" />. 
+        /// Defaults to  <see cref="ResponseCacheLocation.Any" />
         /// </summary>
-        public ResponseCacheLocation? Location { get; set; }
+        public ResponseCacheLocation Location { get; set; } = ResponseCacheLocation.Any;
 
         /// <summary>
         /// Gets or sets the value which determines whether the data should be stored or not.
@@ -29,8 +30,9 @@ namespace Microsoft.AspNetCore.StaticFiles
         /// <see cref="Microsoft.AspNetCore.Http.HttpContext.Response" /> to "no-store".
         /// Ignores the "Location" parameter for values other than "None".
         /// Ignores the "Duration" parameter.
+        /// Defaults to <see langword="false"/>.
         /// </summary>
-        public bool? NoStore { get; set; }
+        public bool NoStore { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the value for the Vary header in <see cref="Microsoft.AspNetCore.Http.HttpContext.Response" />.

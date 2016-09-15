@@ -30,32 +30,19 @@ namespace Microsoft.AspNetCore.StaticFiles
                 throw new ArgumentNullException(nameof(cacheProfile));
             }
 
-            var noStore = cacheProfile.NoStore ?? false;
-            var varyByHeader = cacheProfile.VaryByHeader;
-            var location = cacheProfile.Location ?? ResponseCacheLocation.Any;
-
-            if (!noStore && cacheProfile.Duration == null)
-            {
-                // Duration MUST be set unless NoStore is true.
-                throw new InvalidOperationException(
-                        Resources.FormatResponseCache_SpecifyDuration(
-                            nameof(CacheProfile.NoStore), nameof(CacheProfile.Duration)));
-
-            }
-
             var headers = context.Response.Headers;
 
-            if (!string.IsNullOrEmpty(varyByHeader))
+            if (!string.IsNullOrEmpty(cacheProfile.VaryByHeader))
             {
-                headers[HeaderNames.Vary] = varyByHeader;
+                headers[HeaderNames.Vary] = cacheProfile.VaryByHeader;
             }
 
-            if (noStore)
+            if (cacheProfile.NoStore)
             {
                 headers[HeaderNames.CacheControl] = "no-store";
 
                 // Cache-control: no-store, no-cache is valid.
-                if (location == ResponseCacheLocation.None)
+                if (cacheProfile.Location == ResponseCacheLocation.None)
                 {
                     headers.AppendCommaSeparatedValues(HeaderNames.CacheControl, "no-cache");
                     headers[HeaderNames.Pragma] = "no-cache";
@@ -64,7 +51,7 @@ namespace Microsoft.AspNetCore.StaticFiles
             else
             {
                 string cacheControlValue = null;
-                switch (location)
+                switch (cacheProfile.Location)
                 {
                     case ResponseCacheLocation.Any:
                         cacheControlValue = "public";
@@ -78,7 +65,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                         break;
 
                     default:
-                        var exception = new NotImplementedException($"Unknown {nameof(ResponseCacheLocation)}: {location}");
+                        var exception = new NotImplementedException($"Unknown {nameof(ResponseCacheLocation)}: {cacheProfile.Location}");
                         Debug.Fail(exception.ToString());
                         throw exception;
                 }
@@ -87,7 +74,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                     CultureInfo.InvariantCulture,
                     "{0},max-age={1}",
                     cacheControlValue,
-                    cacheProfile.Duration ?? 0);
+                    cacheProfile.Duration);
 
                 headers[HeaderNames.CacheControl] = cacheControlValue;
             }

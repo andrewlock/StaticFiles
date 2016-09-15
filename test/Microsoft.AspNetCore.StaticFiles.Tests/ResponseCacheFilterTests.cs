@@ -12,42 +12,6 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
 {
     public class ResponseCacheFilterTests
     {
-        [Fact]
-        public void ResponseCacheFilter_DoesNotThrow_WhenNoStoreIsTrue()
-        {
-            // Arrange
-            var responseCacheFilter = new ResponseCacheFilter();
-            var cacheProfile = new CacheProfile
-            {
-                NoStore = true,
-                Duration = null
-            };
-            var context = new DefaultHttpContext();
-
-            // Act
-            responseCacheFilter.ApplyCacheProfile(context, cacheProfile);
-
-            // Assert
-            Assert.Equal("no-store", context.Response.Headers["Cache-control"]);
-        }
-
-        [Fact]
-        public void ApplyCacheProfile_ThrowsIfDurationIsNotSet_WhenNoStoreIsFalse()
-        {
-            // Arrange
-            var responseCacheFilter = new ResponseCacheFilter();
-            var cacheProfile = new CacheProfile
-            {
-                Duration = null
-            };
-            var context = new DefaultHttpContext();
-
-            // Act & Assert
-            var ex = Assert.Throws<InvalidOperationException>(() => responseCacheFilter.ApplyCacheProfile(context, cacheProfile));
-            Assert.Equal("If the 'NoStore' property is not set to true, 'Duration' property must be specified.",
-                ex.Message);
-        }
-
         public static IEnumerable<object[]> CacheControlData
         {
             get
