@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,6 @@ namespace Microsoft.AspNetCore.StaticFiles
         private readonly ILogger _logger;
         private readonly IFileProvider _fileProvider;
         private readonly IContentTypeProvider _contentTypeProvider;
-        private readonly IResponseCacheFilter _responseCacheFilter;
         private string _method;
         private bool _isGet;
         private bool _isHead;
@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.StaticFiles
 
         private IList<RangeItemHeaderValue> _ranges;
 
-        public StaticFileContext(HttpContext context, StaticFileOptions options, PathString matchUrl, ILogger logger, IFileProvider fileProvider, IContentTypeProvider contentTypeProvider, IResponseCacheFilter responseCacheFilter)
+        public StaticFileContext(HttpContext context, StaticFileOptions options, PathString matchUrl, ILogger logger, IFileProvider fileProvider, IContentTypeProvider contentTypeProvider)
         {
             _context = context;
             _options = options;
@@ -64,7 +64,6 @@ namespace Microsoft.AspNetCore.StaticFiles
             _responseHeaders = _response.GetTypedHeaders();
             _fileProvider = fileProvider;
             _contentTypeProvider = contentTypeProvider;
-            _responseCacheFilter = responseCacheFilter;
 
             _method = null;
             _isGet = false;
@@ -319,7 +318,7 @@ namespace Microsoft.AspNetCore.StaticFiles
             var cacheProfile = _options.CacheProfileProvider(staticFileContext) ?? _options.CacheProfile;
             if (cacheProfile != null)
             {
-                _responseCacheFilter.ApplyCacheProfile(_context, cacheProfile);
+                ApplyCacheProfile(_context, cacheProfile);
             }
             _options.OnPrepareResponse(staticFileContext);
         }
@@ -433,6 +432,68 @@ namespace Microsoft.AspNetCore.StaticFiles
             long end = range.To.Value;
             length = end - start + 1;
             return new ContentRangeHeaderValue(start, end, _length);
+        }
+
+        //internal for testing
+        internal static void ApplyCacheProfile(HttpContext context, CacheProfile cacheProfile)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+            if (cacheProfile == null)
+            {
+                throw new ArgumentNullException(nameof(cacheProfile));
+            }
+
+            var headers = context.Response.Headers;
+
+            if (!string.IsNullOrEmpty(cacheProfile.VaryByHeader))
+            {
+                headers[HeaderNames.Vary] = cacheProfile.VaryByHeader;
+            }
+
+            if (cacheProfile.NoStore)
+            {
+                headers[HeaderNames.CacheControl] = "no-store";
+
+                // Cache-control: no-store, no-cache is valid.
+                if (cacheProfile.Location == ResponseCacheLocation.None)
+                {
+                    headers.AppendCommaSeparatedValues(HeaderNames.CacheControl, "no-cache");
+                    headers[HeaderNames.Pragma] = "no-cache";
+                }
+            }
+            else
+            {
+                string cacheControlValue = null;
+                switch (cacheProfile.Location)
+                {
+                    case ResponseCacheLocation.Any:
+                        cacheControlValue = "public";
+                        break;
+                    case ResponseCacheLocation.Client:
+                        cacheControlValue = "private";
+                        break;
+                    case ResponseCacheLocation.None:
+                        cacheControlValue = "no-cache";
+                        headers[HeaderNames.Pragma] = "no-cache";
+                        break;
+
+                    default:
+                        var exception = new NotImplementedException($"Unknown {nameof(ResponseCacheLocation)}: {cacheProfile.Location}");
+                        Debug.Fail(exception.ToString());
+                        throw exception;
+                }
+
+                cacheControlValue = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0},max-age={1}",
+                    cacheControlValue,
+                    cacheProfile.Duration);
+
+                headers[HeaderNames.CacheControl] = cacheControlValue;
+            }
         }
     }
 }

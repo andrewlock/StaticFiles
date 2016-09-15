@@ -92,11 +92,10 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
         public void ApplyCacheProfile_CanSetCacheControlHeaders(CacheProfile cacheProfile, string output)
         {
             // Arrange
-            var responseCacheFilter = new ResponseCacheFilter();
             var context = new DefaultHttpContext();
 
             // Act
-            responseCacheFilter.ApplyCacheProfile(context, cacheProfile);
+            StaticFileContext.ApplyCacheProfile(context, cacheProfile);
 
             // Assert
             Assert.Equal(output, context.Response.Headers["Cache-control"]);
@@ -138,11 +137,10 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
             CacheProfile cacheProfile, string output)
         {
             // Arrange
-            var responseCacheFilter = new ResponseCacheFilter();
             var context = new DefaultHttpContext();
 
             // Act
-            responseCacheFilter.ApplyCacheProfile(context, cacheProfile);
+            StaticFileContext.ApplyCacheProfile(context, cacheProfile);
 
             // Assert
             Assert.Equal(output, context.Response.Headers["Cache-control"]);
@@ -204,11 +202,10 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
         public void ResponseCacheCanSetVary(CacheProfile cacheProfile, string varyOutput, string cacheControlOutput)
         {
             // Arrange
-            var responseCacheFilter = new ResponseCacheFilter();
             var context = new DefaultHttpContext();
 
             // Act
-            responseCacheFilter.ApplyCacheProfile(context, cacheProfile);
+            StaticFileContext.ApplyCacheProfile(context, cacheProfile);
 
             // Assert
             Assert.Equal(varyOutput, context.Response.Headers["Vary"]);
@@ -219,7 +216,6 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
         public void SetsPragmaOnNoCache()
         {
             // Arrange
-            var responseCacheFilter = new ResponseCacheFilter();
             var cacheProfile = new CacheProfile
                 {
                     Duration = 0,
@@ -230,7 +226,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
             var context = new DefaultHttpContext();
 
             // Act
-            responseCacheFilter.ApplyCacheProfile(context, cacheProfile);
+            StaticFileContext.ApplyCacheProfile(context, cacheProfile);
 
             // Assert
             Assert.Equal("no-store,no-cache", context.Response.Headers["Cache-control"]);

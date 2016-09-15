@@ -24,7 +24,6 @@ namespace Microsoft.AspNetCore.StaticFiles
         private readonly ILogger _logger;
         private readonly IFileProvider _fileProvider;
         private readonly IContentTypeProvider _contentTypeProvider;
-        private readonly ResponseCacheFilter _responseCacheFilter;
 
         /// <summary>
         /// Creates a new instance of the StaticFileMiddleware.
@@ -60,7 +59,6 @@ namespace Microsoft.AspNetCore.StaticFiles
             _contentTypeProvider = options.Value.ContentTypeProvider ?? new FileExtensionContentTypeProvider();
             _fileProvider = _options.FileProvider ?? Helpers.ResolveFileProvider(hostingEnv);
             _matchUrl = _options.RequestPath;
-            _responseCacheFilter = new ResponseCacheFilter();
             _logger = loggerFactory.CreateLogger<StaticFileMiddleware>();
         }
 
@@ -71,7 +69,7 @@ namespace Microsoft.AspNetCore.StaticFiles
         /// <returns></returns>
         public Task Invoke(HttpContext context)
         {
-            var fileContext = new StaticFileContext(context, _options, _matchUrl, _logger, _fileProvider, _contentTypeProvider, _responseCacheFilter);
+            var fileContext = new StaticFileContext(context, _options, _matchUrl, _logger, _fileProvider, _contentTypeProvider);
           
             if (!fileContext.ValidateMethod())
             {
