@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -21,10 +22,16 @@ namespace StaticFilesSample
             // Displays all log levels
             factory.AddConsole(LogLevel.Debug);
 
-            app.UseFileServer(new FileServerOptions
+            var options = new FileServerOptions
             {
-                EnableDirectoryBrowsing = true
-            });
+                EnableDirectoryBrowsing = true,
+            };
+            options.StaticFileOptions.CacheProfile = new CacheProfile
+            {
+                Duration = 60,
+                Location = ResponseCacheLocation.Client,
+            };
+            app.UseFileServer(options);
         }
 
         public static void Main(string[] args)
