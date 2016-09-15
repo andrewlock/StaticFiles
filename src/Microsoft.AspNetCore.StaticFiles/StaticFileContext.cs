@@ -316,7 +316,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                 File = _fileInfo,
             };
 
-            var cacheProfile = _options.CacheProfileProvider(staticFileContext) ?? _options.DefaultCacheProfile;
+            var cacheProfile = _options.CacheProfileProvider(staticFileContext) ?? _options.CacheProfile;
             if (cacheProfile != null)
             {
                 _responseCacheFilter.ApplyCacheProfile(_context, cacheProfile);

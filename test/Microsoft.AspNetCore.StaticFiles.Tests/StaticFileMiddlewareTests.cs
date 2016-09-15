@@ -121,7 +121,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                 {
                     RequestPath = new PathString(baseUrl),
                     FileProvider = fileProvider,
-                    DefaultCacheProfile = new CacheProfile { NoStore = true }
+                    CacheProfile = new CacheProfile { NoStore = true }
                 }));
                 var response = await server.CreateRequest(requestUrl).GetAsync();
 
@@ -159,7 +159,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                 {
                     RequestPath = new PathString(baseUrl),
                     FileProvider = fileProvider,
-                    DefaultCacheProfile = new CacheProfile {  Duration = 60},
+                    CacheProfile = new CacheProfile {  Duration = 60},
                     CacheProfileProvider = _ => new CacheProfile { NoStore = true }
                 }));
                 var response = await server.CreateRequest(requestUrl).GetAsync();

@@ -44,11 +44,11 @@ namespace Microsoft.AspNetCore.Builder
         /// <summary>
         /// The default cache profile settings to apply to all static files served. 
         /// </summary>
-        public CacheProfile DefaultCacheProfile { get; set; }
+        public CacheProfile CacheProfile { get; set; }
 
         /// <summary>
-        /// Called to provide a specific <see cref="CacheProfile"/> for the given 
-        /// <see cref="StaticFileResponseContext"/>. Return null to use the <see cref="DefaultCacheProfile"/>.
+        /// Called to provide a specific <see cref="StaticFiles.CacheProfile"/> for the given 
+        /// <see cref="StaticFileResponseContext"/>. Return null to use the <see cref="CacheProfile"/>.
         /// </summary>
         public Func<StaticFileResponseContext, CacheProfile> CacheProfileProvider { get; set; }
 
