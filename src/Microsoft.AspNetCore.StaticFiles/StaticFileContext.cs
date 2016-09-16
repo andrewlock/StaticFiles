@@ -486,11 +486,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                         throw exception;
                 }
 
-                cacheControlValue = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0},max-age={1}",
-                    cacheControlValue,
-                    cacheProfile.Duration);
+                cacheControlValue = cacheControlValue + ",max-age=" + cacheProfile.Duration;
 
                 headers[HeaderNames.CacheControl] = cacheControlValue;
             }
