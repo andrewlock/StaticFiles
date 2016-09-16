@@ -31,6 +31,20 @@ namespace StaticFilesSample
                 Duration = 60,
                 Location = ResponseCacheLocation.Client,
             };
+            options.StaticFileOptions.CacheProfileProvider =
+                ctx =>
+                {
+                    if (ctx.File.Name.EndsWith(".html"))
+                    {
+                        return new CacheProfile
+                        {
+                            Duration = 600,
+                            Location = ResponseCacheLocation.Any,
+                        };
+                    }
+                    //use default CacheProfile
+                    return null;
+                };
             app.UseFileServer(options);
         }
 
