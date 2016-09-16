@@ -467,16 +467,17 @@ namespace Microsoft.AspNetCore.StaticFiles
             else
             {
                 string cacheControlValue = null;
+                var duration = (int)cacheProfile.Duration.TotalSeconds;
                 switch (cacheProfile.Location)
                 {
                     case ResponseCacheLocation.Any:
-                        cacheControlValue = "public";
+                        cacheControlValue = "public,max-age=" + duration;
                         break;
                     case ResponseCacheLocation.Client:
-                        cacheControlValue = "private";
+                        cacheControlValue = "private,max-age=" + duration;
                         break;
                     case ResponseCacheLocation.None:
-                        cacheControlValue = "no-cache";
+                        cacheControlValue = "no-cache,max-age=" + duration;
                         headers[HeaderNames.Pragma] = "no-cache";
                         break;
 
@@ -485,8 +486,6 @@ namespace Microsoft.AspNetCore.StaticFiles
                         Debug.Fail(exception.ToString());
                         throw exception;
                 }
-
-                cacheControlValue = cacheControlValue + ",max-age=" + (int)cacheProfile.Duration.TotalSeconds;
 
                 headers[HeaderNames.CacheControl] = cacheControlValue;
             }
