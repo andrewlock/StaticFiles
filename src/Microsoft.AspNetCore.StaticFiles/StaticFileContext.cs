@@ -486,7 +486,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                         throw exception;
                 }
 
-                cacheControlValue = cacheControlValue + ",max-age=" + cacheProfile.Duration;
+                cacheControlValue = cacheControlValue + ",max-age=" + (int)cacheProfile.Duration.TotalSeconds;
 
                 headers[HeaderNames.CacheControl] = cacheControlValue;
             }

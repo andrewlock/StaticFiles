@@ -159,7 +159,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                 {
                     RequestPath = new PathString(baseUrl),
                     FileProvider = fileProvider,
-                    CacheProfile = new CacheProfile {  Duration = 60},
+                    CacheProfile = new CacheProfile {  Duration = TimeSpan.FromMinutes(1)},
                     CacheProfileProvider = _ => new CacheProfile { NoStore = true }
                 }));
                 var response = await server.CreateRequest(requestUrl).GetAsync();

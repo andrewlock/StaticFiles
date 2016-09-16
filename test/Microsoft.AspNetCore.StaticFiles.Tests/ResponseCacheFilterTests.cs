@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 0, Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(0), Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
                     },
                     "no-store"
                 };
@@ -27,14 +27,14 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 0, Location = ResponseCacheLocation.Client, NoStore = true, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(0), Location = ResponseCacheLocation.Client, NoStore = true, VaryByHeader = null
                     },
                     "no-store"
                 };
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 0, Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(0), Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
                     },
                     "no-store"
                 };
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 100, Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(100), Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
                     },
                     "no-store"
                 };
@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 10, Location = ResponseCacheLocation.Client,
+                        Duration = TimeSpan.FromSeconds(10), Location = ResponseCacheLocation.Client,
                         NoStore = false, VaryByHeader = null
                     },
                     "private,max-age=10"
@@ -58,21 +58,21 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 10, Location = ResponseCacheLocation.Any, NoStore = false, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(10), Location = ResponseCacheLocation.Any, NoStore = false, VaryByHeader = null
                     },
                     "public,max-age=10"
                 };
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 10, Location = ResponseCacheLocation.None, NoStore = false, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(10), Location = ResponseCacheLocation.None, NoStore = false, VaryByHeader = null
                     },
                     "no-cache,max-age=10"
                 };
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 31536000, Location = ResponseCacheLocation.Any,
+                        Duration = TimeSpan.FromDays(365), Location = ResponseCacheLocation.Any,
                         NoStore = false, VaryByHeader = null
                     },
                     "public,max-age=31536000"
@@ -80,9 +80,23 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 20, Location = ResponseCacheLocation.Any, NoStore = false, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(20), Location = ResponseCacheLocation.Any, NoStore = false, VaryByHeader = null
                     },
                     "public,max-age=20"
+                };
+                yield return new object[] {
+                    new CacheProfile
+                    {
+                        Duration = TimeSpan.FromMilliseconds(1400), Location = ResponseCacheLocation.Any, NoStore = false, VaryByHeader = null
+                    },
+                    "public,max-age=1"
+                };
+                yield return new object[] {
+                    new CacheProfile
+                    {
+                        Duration = TimeSpan.FromMilliseconds(1600), Location = ResponseCacheLocation.Any, NoStore = false, VaryByHeader = null
+                    },
+                    "public,max-age=1"
                 };
             }
         }
@@ -109,14 +123,14 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 0, Location = ResponseCacheLocation.Client, NoStore = true, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(0), Location = ResponseCacheLocation.Client, NoStore = true, VaryByHeader = null
                     },
                     "no-store"
                 };
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 0, Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(0), Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
                     },
                     "no-store"
                 };
@@ -124,7 +138,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 100, Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
+                        Duration = TimeSpan.FromSeconds(100), Location = ResponseCacheLocation.Any, NoStore = true, VaryByHeader = null
                     },
                     "no-store"
                 };
@@ -153,7 +167,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 10, Location = ResponseCacheLocation.Any,
+                        Duration = TimeSpan.FromSeconds(10), Location = ResponseCacheLocation.Any,
                         NoStore = false, VaryByHeader = "Accept"
                     },
                     "Accept",
@@ -161,7 +175,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 0, Location= ResponseCacheLocation.Any,
+                        Duration = TimeSpan.FromSeconds(0), Location= ResponseCacheLocation.Any,
                         NoStore = true, VaryByHeader = "Accept"
                     },
                     "Accept",
@@ -170,7 +184,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 10, Location = ResponseCacheLocation.Client,
+                        Duration = TimeSpan.FromSeconds(10), Location = ResponseCacheLocation.Client,
                         NoStore = false, VaryByHeader = "Accept"
                     },
                     "Accept",
@@ -179,7 +193,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 10, Location = ResponseCacheLocation.Client,
+                        Duration = TimeSpan.FromSeconds(10), Location = ResponseCacheLocation.Client,
                         NoStore = false, VaryByHeader = "Test"
                     },
                     "Test",
@@ -188,11 +202,29 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
                 yield return new object[] {
                     new CacheProfile
                     {
-                        Duration = 31536000, Location = ResponseCacheLocation.Any,
+                        Duration = TimeSpan.FromDays(365), Location = ResponseCacheLocation.Any,
                         NoStore = false, VaryByHeader = "Test"
                     },
                     "Test",
                     "public,max-age=31536000"
+                };
+                yield return new object[] {
+                    new CacheProfile
+                    {
+                        Duration = TimeSpan.FromMilliseconds(1400), Location = ResponseCacheLocation.Any, 
+                        NoStore = false, VaryByHeader = "Test"
+                    },
+                    "Test",
+                    "public,max-age=1"
+                };
+                yield return new object[] {
+                    new CacheProfile
+                    {
+                        Duration = TimeSpan.FromMilliseconds(1600), Location = ResponseCacheLocation.Any, 
+                        NoStore = false, VaryByHeader = "Test"
+                    },
+                    "Test",
+                    "public,max-age=1"
                 };
             }
         }
@@ -218,7 +250,7 @@ namespace Microsoft.AspNetCore.StaticFiles.Tests
             // Arrange
             var cacheProfile = new CacheProfile
                 {
-                    Duration = 0,
+                    Duration = TimeSpan.FromSeconds(0),
                     Location = ResponseCacheLocation.None,
                     NoStore = true,
                     VaryByHeader = null

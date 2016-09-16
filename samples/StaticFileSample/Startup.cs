@@ -28,7 +28,7 @@ namespace StaticFilesSample
             };
             options.StaticFileOptions.CacheProfile = new CacheProfile
             {
-                Duration = 60,
+                Duration = TimeSpan.FromSeconds(30),
                 Location = ResponseCacheLocation.Client,
             };
             options.StaticFileOptions.CacheProfileProvider =
@@ -38,7 +38,7 @@ namespace StaticFilesSample
                     {
                         return new CacheProfile
                         {
-                            Duration = 600,
+                            Duration = TimeSpan.FromMinutes(15),
                             Location = ResponseCacheLocation.Any,
                         };
                     }

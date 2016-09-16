@@ -1,6 +1,8 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
+
 namespace Microsoft.AspNetCore.StaticFiles
 {
     /// <summary>
@@ -9,12 +11,12 @@ namespace Microsoft.AspNetCore.StaticFiles
     public class CacheProfile
     {
         /// <summary>
-        /// Gets or sets the duration in seconds for which the response is cached.
+        /// Gets or sets the duration for which the response is cached.
         /// Sets the "max-age" in the "Cache-control" header in the 
         /// <see cref="Microsoft.AspNetCore.Http.HttpContext.Response" />.
         /// Defaults to 10 minutes
         /// </summary>
-        public int Duration { get; set; } = 600;
+        public TimeSpan Duration { get; set; } = TimeSpan.FromMinutes(10);
 
         /// <summary>
         /// Gets or sets the location where the data from a particular URL must be cached.
