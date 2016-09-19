@@ -315,7 +315,7 @@ namespace Microsoft.AspNetCore.StaticFiles
                 File = _fileInfo,
             };
 
-            var cacheProfile = _options.CacheProfileProvider(staticFileContext) ?? _options.CacheProfile;
+            var cacheProfile = _options?.CacheProfileProvider(staticFileContext) ?? _options.CacheProfile;
             if (cacheProfile != null)
             {
                 ApplyCacheProfile(_context, cacheProfile);
@@ -455,19 +455,21 @@ namespace Microsoft.AspNetCore.StaticFiles
 
             if (cacheProfile.NoStore)
             {
-                headers[HeaderNames.CacheControl] = "no-store";
-
                 // Cache-control: no-store, no-cache is valid.
                 if (cacheProfile.Location == ResponseCacheLocation.None)
                 {
-                    headers.AppendCommaSeparatedValues(HeaderNames.CacheControl, "no-cache");
+                    headers[HeaderNames.CacheControl] = "no-store,no-cache";
                     headers[HeaderNames.Pragma] = "no-cache";
+                }
+                else
+                {
+                    headers[HeaderNames.CacheControl] = "no-store";
                 }
             }
             else
             {
                 string cacheControlValue = null;
-                var duration = (int)cacheProfile.Duration.TotalSeconds;
+                var duration = ((int)cacheProfile.Duration.TotalSeconds).ToString(CultureInfo.InvariantCulture);
                 switch (cacheProfile.Location)
                 {
                     case ResponseCacheLocation.Any:
